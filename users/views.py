@@ -3,11 +3,13 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from users.models import User
-from users.serializers import UserSignUpSerializer, UserLogInSerializer
-from rest_framework.decorators import api_view
+from users.serializers import UserChangePasswordSerializer, UserEditProfileSerializer, UserSerializer, UserLogInSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken as Refresh
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
 
@@ -16,7 +18,7 @@ from rest_framework_simplejwt.tokens import RefreshToken as Refresh
 def user_sign_up(request):
     if request.method == 'POST':
         user_data = JSONParser().parse(request)
-        user_serializer = UserSignUpSerializer(data=user_data)
+        user_serializer = UserSerializer(data=user_data)
         if user_serializer.is_valid():
             user_serializer.validated_data['password'] = make_password(user_serializer.validated_data['password'])
             user_serializer.save()
@@ -47,4 +49,37 @@ def user_log_in(request):
                 'error_message': 'email or password is incorrect.',
                 'error_code': 400
             }, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def user_change_password(request):
+    try:
+        user = User.objects.get(pk=request.user.id) 
+    except User.DoesNotExist: 
+        return JsonResponse({'message': 'user not found.'}, status=status.HTTP_404_NOT_FOUND) 
+ 
+    if request.method == 'PUT': 
+        user_data = JSONParser().parse(request)
+        user_serializer = UserChangePasswordSerializer(user, data=user_data) 
+        if user_serializer.is_valid():
+            user_serializer.validated_data['password'] = make_password(user_serializer.validated_data['new_password'])
+            user_serializer.save() 
+            return JsonResponse(user_serializer.data, status=status.HTTP_200_OK) 
+        return JsonResponse(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def user_edit_profile(request):
+    try:
+        user = User.objects.get(pk=request.user.id) 
+    except User.DoesNotExist: 
+        return JsonResponse({'message': 'user not found.'}, status=status.HTTP_404_NOT_FOUND) 
+ 
+    if request.method == 'PUT': 
+        user_data = JSONParser().parse(request)
+        user_serializer = UserEditProfileSerializer(user, data=user_data) 
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return JsonResponse(user_serializer.data, status=status.HTTP_200_OK)
         return JsonResponse(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

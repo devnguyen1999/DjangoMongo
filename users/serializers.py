@@ -2,10 +2,10 @@ from rest_framework import serializers
 from users.models import User, RefreshToken
 
 
-class UserSignUpSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'password']
+        fields = ['first_name', 'last_name', 'email', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
 
@@ -15,3 +15,15 @@ class UserLogInSerializer(serializers.Serializer):
 
 class RefreshTokenSerializer(serializers.Serializer):
     refresh_token = serializers.CharField(required=True)
+
+
+class UserChangePasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+class UserEditProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
