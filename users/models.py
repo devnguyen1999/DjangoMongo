@@ -12,8 +12,8 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, unique=True)
-    password = models.CharField(max_length=100)
-    is_verified = models.BooleanField()
+    password = models.TextField()
+    is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -26,7 +26,7 @@ class User(AbstractUser):
 
 class RefreshToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=200)
+    token = models.TextField()
 
     def __str__(self):
         return self.token

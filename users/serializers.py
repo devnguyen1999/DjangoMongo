@@ -16,7 +16,6 @@ class UserLogInSerializer(serializers.Serializer):
 class RefreshTokenSerializer(serializers.Serializer):
     refresh_token = serializers.CharField(required=True)
 
-
 class UserChangePasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
