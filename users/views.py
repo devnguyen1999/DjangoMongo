@@ -3,14 +3,13 @@ from django.conf import settings
 import jwt
 from users.utils import generate_access_token, generate_refresh_token, account_activation_token, reset_password_token
 from django.http.response import HttpResponseRedirect, JsonResponse
-from rest_framework.parsers import JSONParser
 from rest_framework import status
 from users.models import RefreshToken, User
 from users.serializers import UserChangePasswordSerializer, UserSerializer, UserLogInSerializer, UserResetPasswordSerializer, UserForgotPasswordSerializer
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.template.loader import get_template
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -23,7 +22,7 @@ from django.utils.encoding import force_bytes
 @permission_classes([AllowAny])
 def sign_up(request):
     if request.method == 'POST':
-        user_data = JSONParser().parse(request)
+        user_data = request.data
         user_serializer = UserSerializer(data=user_data)
         if user_serializer.is_valid():
             user_serializer.validated_data['password'] = make_password(
@@ -83,7 +82,8 @@ def verify_account(request, uidb64, token):
 @ensure_csrf_cookie
 def log_in(request):
     if request.method == 'POST':
-        user_data = JSONParser().parse(request)
+        user_data = request.data
+        
         user_serializer = UserLogInSerializer(data=user_data)
         if user_serializer.is_valid():
             try:
@@ -150,7 +150,7 @@ def change_password(request):
         except User.DoesNotExist:
             return JsonResponse(
                 {'error_message': 'User not found.', },  status=status.HTTP_404_NOT_FOUND)
-        user_data = JSONParser().parse(request)
+        user_data = request.data
         user_serializer = UserChangePasswordSerializer(user, data=user_data)
         if user_serializer.is_valid():
             if check_password(user_serializer.validated_data['password'], user.password):
@@ -170,7 +170,7 @@ def change_password(request):
 @permission_classes([AllowAny])
 def forgot_password(request):
     if request.method == 'POST':
-        user_data = JSONParser().parse(request)
+        user_data = request.data
         user_serializer = UserForgotPasswordSerializer(data=user_data)
         if user_serializer.is_valid():
             try:
@@ -210,7 +210,7 @@ def forgot_password(request):
 @permission_classes([AllowAny])
 def reset_password(request):
     if request.method == 'PUT':
-        data = JSONParser().parse(request)
+        data = request.data
         data_serializer = UserResetPasswordSerializer(data=data)
         if data_serializer.is_valid():
             try:
@@ -247,7 +247,7 @@ def edit_profile(request):
             {'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
-        user_data = JSONParser().parse(request)
+        user_data = request.data
         user_serializer = UserSerializer(user, data=user_data)
         if user_serializer.is_valid():
             user_serializer.save()
