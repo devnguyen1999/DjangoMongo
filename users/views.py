@@ -83,7 +83,6 @@ def verify_account(request, uidb64, token):
 def log_in(request):
     if request.method == 'POST':
         user_data = request.data
-        
         user_serializer = UserLogInSerializer(data=user_data)
         if user_serializer.is_valid():
             try:
@@ -221,12 +220,8 @@ def reset_password(request):
                 return JsonResponse(
                     {'error_message': 'An error occurred. Please try again.', },  status=status.HTTP_400_BAD_REQUEST)
             if reset_password_token.check_token(user, data_serializer.validated_data['token']):
-                user_serializer = UserSerializer(user)
-                user_data = user_serializer.data
-                user_data['password'] = make_password(
-                    data_serializer.validated_data['new_password'])
                 user_serializer = UserSerializer(
-                    user, data=user_data)
+                    user, data={'password': make_password(data_serializer.validated_data['new_password'])}, partial=True)
                 if user_serializer.is_valid():
                     user_serializer.save()
                     return JsonResponse(

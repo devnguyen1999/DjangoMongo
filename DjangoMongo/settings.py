@@ -42,8 +42,13 @@ INSTALLED_APPS = [
     'rest_framework',
     # CORS
     'corsheaders',
-    # Users application
-    'users.apps.UsersConfig'
+    # Applications
+    'users.apps.UsersConfig',
+    'admins.apps.AdminsConfig',
+    'posts.apps.PostsConfig',
+    'products.apps.ProductsConfig',
+    'carts.apps.CartsConfig',
+    'orders.apps.OrdersConfig',
 ]
 
 MIDDLEWARE = [
