@@ -43,12 +43,15 @@ INSTALLED_APPS = [
     # CORS
     'corsheaders',
     # Applications
-    'users.apps.UsersConfig',
     'admins.apps.AdminsConfig',
+    'carts.apps.CartsConfig',
+    'customers.apps.CustomersConfig',
+    'moderators.apps.ModeratorsConfig',
+    'orders.apps.OrdersConfig',
     'posts.apps.PostsConfig',
     'products.apps.ProductsConfig',
-    'carts.apps.CartsConfig',
-    'orders.apps.OrdersConfig',
+    'users.apps.UsersConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -153,7 +156,7 @@ REST_FRAMEWORK = {
     )
 }
 
-#Email settings details
+# Email settings details
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True

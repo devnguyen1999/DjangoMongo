@@ -1,5 +1,5 @@
 from django.urls import path
-from admins import views
+from moderators import views
 
 urlpatterns = [
     path('log-in', views.log_in, name='log_in'),

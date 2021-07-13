@@ -18,6 +18,96 @@ from django.utils.encoding import force_bytes
 # Create your views here.
 
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def sign_up(request):
+    if request.method == 'POST':
+        user_data = request.data
+        user_serializer = UserSerializer(data=user_data)
+        if user_serializer.is_valid():
+            user_serializer.validated_data['password'] = make_password(
+                user_serializer.validated_data['password'])
+            user_serializer.save()
+            try:
+                user = User.objects.get(
+                    email=user_serializer.validated_data['email'])
+            except User.DoesNotExist:
+                return JsonResponse(
+                    {'error_message': 'User not found.', },  status=status.HTTP_404_NOT_FOUND)
+            try:
+                uidb64 = urlsafe_base64_encode(force_bytes(user.id))
+                verify_account_token = account_activation_token.make_token(
+                    user)
+                data = {
+                    'first_name': user.first_name,
+                    'url': request.scheme + '://' + request.get_host() + '/api/user/verify-account/' + uidb64 + '/' + verify_account_token,
+                }
+                message = get_template(os.path.join(
+                    settings.BASE_DIR, 'users/templates/verify_account.html')).render(data)
+                msg = EmailMessage(
+                    'Verify your account.',
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user_serializer.validated_data['email']]
+                )
+                msg.content_subtype = "html"
+                msg.send()
+            except Exception:
+                user.delete()
+                return JsonResponse(
+                    {'error_message': 'An error occurred. Please try again.', },  status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                user_serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(user_serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def verify_account(request, uidb64, token):
+    if request.method == 'GET':
+        try:
+            id = urlsafe_base64_decode(uidb64)
+            user = User.objects.get(id=id)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return HttpResponseRedirect(redirect_to='https://www.google.com.vn/')
+        if account_activation_token.check_token(user, token):
+            user.is_verified = True
+            user.save()
+            return HttpResponseRedirect(redirect_to='https://www.facebook.com/')
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@ensure_csrf_cookie
+def log_in(request):
+    if request.method == 'POST':
+        user_data = request.data
+        user_serializer = UserLogInSerializer(data=user_data)
+        if user_serializer.is_valid():
+            try:
+                user = User.objects.get(
+                    email=user_serializer.validated_data['email'])
+            except User.DoesNotExist:
+                return JsonResponse(
+                    {'error_message': 'User not found.', },  status=status.HTTP_404_NOT_FOUND)
+            if check_password(user_serializer.validated_data['password'], user.password):
+                access_token = generate_access_token(user)
+                refresh_token = generate_refresh_token(user)
+                token = RefreshToken(user=user, token=refresh_token)
+                token.save()
+                response = JsonResponse(
+                    {'access_token': access_token, }, status=status.HTTP_200_OK)
+                response.set_cookie(key='refreshtoken',
+                                    value=refresh_token, httponly=True)
+                return response
+            else:
+                return JsonResponse(
+                    {'error_message': 'Password is incorrect.', }, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(user_serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def refresh_token(request):
