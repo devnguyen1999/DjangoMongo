@@ -1,8 +1,8 @@
 from django.urls import path
-from customers import views
+from customers.views import SignUpView, VerifyAccountView, LogInView
 
 urlpatterns = [
-    path('sign-up', views.sign_up, name='sign_up'),
-    path('verify-account/<uidb64>/<token>', views.verify_account, name='verify_account'),
-    path('log-in', views.log_in, name='log_in'),
+    path('sign-up', SignUpView.as_view(), name='sign_up'),
+    path('verify-account/<uidb64>/<token>', VerifyAccountView.as_view(), name='verify_account'),
+    path('log-in', LogInView.as_view(), name='log_in'),
 ]

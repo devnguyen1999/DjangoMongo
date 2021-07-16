@@ -13,10 +13,6 @@ class CSRFCheck(CsrfViewMiddleware):
 
 
 class CustomJWTAuthentication(BaseAuthentication):
-    '''
-        custom authentication class for DRF and JWT
-        https://github.com/encode/django-rest-framework/blob/master/rest_framework/authentication.py
-    '''
 
     def authenticate(self, request):
         authorization_heaader = request.headers.get('Authorization')
@@ -37,7 +33,6 @@ class CustomJWTAuthentication(BaseAuthentication):
         user = User.objects.get(id=payload['user_id'])
         if user is None:
             raise exceptions.AuthenticationFailed('User not found.')
-
 
         self.enforce_csrf(request)
         return (user, None)

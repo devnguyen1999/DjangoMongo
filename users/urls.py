@@ -1,10 +1,9 @@
 from django.urls import path
-from users import views
+from users.views import RefreshTokenView, ChangePasswordView, ForgotPasswordView, UserProfileView
 
 urlpatterns = [
-    path('refresh-token', views.refresh_token, name='refresh_token'),
-    path('change-password', views.change_password, name='change_password'),
-    path('forgot-password', views.forgot_password, name='forgot_password'),
-    path('reset-password', views.reset_password, name='reset_password'),
-    path('edit-profile', views.edit_profile, name='edit_profile'),
+    path('refresh-token', RefreshTokenView.as_view(), name='refresh_token'),
+    path('change-password', ChangePasswordView.as_view(), name='change_password'),
+    path('forgot-password', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('profile', UserProfileView.as_view(), name='profile'),
 ]

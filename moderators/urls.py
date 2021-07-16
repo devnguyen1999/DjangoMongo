@@ -1,7 +1,7 @@
 from django.urls import path
-from moderators import views
+from moderators.views import AddAdminView, RemoveAdminView
 
 urlpatterns = [
-    path('add-admin', views.add_admin, name='add_admin'),
-    path('remove-admin', views.remove_admin, name='remove_admin'),
+    path('add-admin', AddAdminView.as_view(), name='add_admin'),
+    path('remove-admin', RemoveAdminView.as_view(), name='remove_admin'),
 ]
