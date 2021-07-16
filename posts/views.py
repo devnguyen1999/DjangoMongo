@@ -51,3 +51,4 @@ class PostView(APIView):
         post = self.get_object(pk)
         post.delete()
         return JsonResponse({'message': 'Post was deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
