@@ -5,8 +5,15 @@ from users.models import User, RefreshToken
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields = ['first_name', 'last_name',]
+
+
+class UserInitializeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
         fields = ['first_name', 'last_name', 'email', 'password']
         extra_kwargs = {'password': {'write_only': True}}
+
 
 
 class UserLogInSerializer(serializers.Serializer):

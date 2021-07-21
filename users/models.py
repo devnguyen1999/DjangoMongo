@@ -15,7 +15,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
     password = models.TextField()
     is_verified = models.BooleanField(default=False)
-    roles = models.JSONField(default=['Customer'])
+    roles = models.JSONField(default=['User'])
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

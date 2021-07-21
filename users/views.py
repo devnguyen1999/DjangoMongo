@@ -5,7 +5,7 @@ from users.utils import account_activation_token, generate_access_token, generat
 from django.http.response import HttpResponseRedirect, JsonResponse
 from rest_framework import exceptions, status
 from users.models import RefreshToken, User
-from users.serializers import UserChangePasswordSerializer, UserLogInSerializer, UserSerializer, UserResetPasswordSerializer, UserForgotPasswordSerializer
+from users.serializers import UserChangePasswordSerializer, UserLogInSerializer, UserSerializer, UserInitializeSerializer, UserResetPasswordSerializer, UserForgotPasswordSerializer
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
@@ -21,7 +21,7 @@ from django.utils.decorators import method_decorator
 class SignUpView(APIView):
 
     def post(self, request, format=None):
-        user_serializer = UserSerializer(data=request.data)
+        user_serializer = UserInitializeSerializer(data=request.data)
         if user_serializer.is_valid():
             user_serializer.validated_data['password'] = make_password(
                 user_serializer.validated_data['password'])
@@ -203,7 +203,7 @@ class ForgotPasswordView(APIView):
                 data_serializer.validated_data['uidb64'])
             user = self.get_object(email)
             if reset_password_token.check_token(user, data_serializer.validated_data['token']):
-                user_serializer = UserSerializer(
+                user_serializer = UserInitializeSerializer(
                     user, data={'password': make_password(data_serializer.validated_data['new_password'])}, partial=True)
                 if user_serializer.is_valid():
                     user_serializer.save()
