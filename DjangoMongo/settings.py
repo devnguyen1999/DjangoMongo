@@ -144,6 +144,8 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost',
 )
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {

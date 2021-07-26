@@ -169,6 +169,7 @@ class ForgotPasswordView(APIView):
 
     def get_object(self, email):
         try:
+            print(email)
             return User.objects.get(email=email)
         except User.DoesNotExist:
             raise exceptions.NotFound('User not found.')
@@ -206,7 +207,7 @@ class ForgotPasswordView(APIView):
         data_serializer = UserResetPasswordSerializer(data=request.data)
         if data_serializer.is_valid():
             email = urlsafe_base64_decode(
-                data_serializer.validated_data['uidb64'])
+                data_serializer.validated_data['uidb64']).decode()
             user = self.get_object(email)
             if reset_password_token.check_token(user, data_serializer.validated_data['token']):
                 user_serializer = UserInitializeSerializer(
