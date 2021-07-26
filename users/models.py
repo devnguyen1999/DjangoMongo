@@ -12,6 +12,7 @@ class User(AbstractUser):
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    avatar = models.URLField(max_length=200)
     email = models.EmailField(max_length=100, unique=True)
     password = models.TextField()
     is_verified = models.BooleanField(default=False)
@@ -35,4 +36,4 @@ class RefreshToken(models.Model):
         return self.token
 
     class Meta:
-        db_table = 'RefreshTokens'
+        db_table = 'Refresh_tokens'

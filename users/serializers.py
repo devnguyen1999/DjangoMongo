@@ -3,9 +3,10 @@ from users.models import User, RefreshToken
 
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=True)
     class Meta:
         model = User
-        fields = ['first_name', 'last_name',]
+        fields = ['first_name', 'last_name', 'avatar']
 
 
 class UserInitializeSerializer(serializers.ModelSerializer):

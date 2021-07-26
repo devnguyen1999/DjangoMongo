@@ -1,19 +1,18 @@
-from django.db.models.fields import CharField
+from posts.models import Post
 from rest_framework import serializers
-from posts.models import Post, Image
 
 
 class PostSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=True)
     class Meta:
         model = Post
-        fields = ['title', 'short_content', 'content']
+        fields = ['title', 'short_content', 'content', 'image' ]
 
 
-class UploadImageSerializer(serializers.ModelSerializer):
-    class Meta():
-        model = Image
-        fields = ('image', 'uploaded_at')
+
+class UploadImageSerializer(serializers.Serializer):
+    image = serializers.ImageField(required=True)
 
 
 class DeleteImageSerializer(serializers.Serializer):
-    image =serializers.CharField(required=True)
+    public_id = serializers.CharField(required=True)

@@ -11,7 +11,7 @@ def generate_access_token(user):
 
     access_token_payload = {
         'user_id': user.id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, hours=6, minutes=0),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30, hours=0, minutes=0),
         'iat': datetime.datetime.utcnow(),
     }
     access_token = jwt.encode(
@@ -22,7 +22,7 @@ def generate_access_token(user):
 def generate_refresh_token(user):
     refresh_token_payload = {
         'user_id': user.id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, hours=0, minutes=0),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=45, hours=0, minutes=0),
         'iat': datetime.datetime.utcnow()
     }
     refresh_token = jwt.encode(

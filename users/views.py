@@ -1,4 +1,6 @@
-import os, jwt
+import os
+import jwt
+import cloudinary.uploader
 from django.conf import settings
 from rest_framework.views import APIView
 from users.utils import account_activation_token, generate_access_token, generate_refresh_token, reset_password_token
@@ -17,6 +19,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 
 # Create your views here.
+
 
 class SignUpView(APIView):
 
@@ -38,12 +41,12 @@ class SignUpView(APIView):
                     user)
                 data = {
                     'first_name': user.first_name,
-                    'url': request.scheme + '://' + request.get_host() + '/api/user/verify-account/' + uidb64 + '/' + verify_account_token,
+                    'url': request.scheme + '://' + request.get_host() + '/api/user/verify-email/' + uidb64 + '/' + verify_account_token,
                 }
                 message = get_template(os.path.join(
-                    settings.BASE_DIR, 'customers/templates/verify_account.html')).render(data)
+                    settings.BASE_DIR, 'users/templates/verify_email.html')).render(data)
                 msg = EmailMessage(
-                    'Verify your account.',
+                    'Verify your email.',
                     message,
                     settings.DEFAULT_FROM_EMAIL,
                     [user_serializer.validated_data['email']]
@@ -55,7 +58,7 @@ class SignUpView(APIView):
                 return JsonResponse(
                     {'error_message': 'An error occurred. Please try again.', },  status=status.HTTP_400_BAD_REQUEST)
             return JsonResponse(
-                user_serializer.data, status=status.HTTP_201_CREATED)
+                {'success': True}, status=status.HTTP_201_CREATED)
         return JsonResponse(user_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -75,7 +78,7 @@ class VerifyAccountView(APIView):
 
 
 class LogInView(APIView):
-    
+
     @method_decorator([ensure_csrf_cookie])
     def post(self, request, format=None):
         user_serializer = UserLogInSerializer(data=request.data)
@@ -101,6 +104,7 @@ class LogInView(APIView):
                     {'error_message': 'Password is incorrect.', }, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(user_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
 
 class RefreshTokenView(APIView):
 
@@ -135,6 +139,7 @@ class RefreshTokenView(APIView):
             return JsonResponse(
                 {'access_token': access_token, })
 
+
 class ChangePasswordView(APIView):
 
     @permission_classes([IsAuthenticated])
@@ -158,6 +163,7 @@ class ChangePasswordView(APIView):
                     {'error_message': 'Password is incorrect.', }, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(user_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
 
 class ForgotPasswordView(APIView):
 
@@ -215,6 +221,7 @@ class ForgotPasswordView(APIView):
         return JsonResponse(
             data_serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserProfileView(APIView):
 
     def get_object(self, pk):
@@ -224,16 +231,20 @@ class UserProfileView(APIView):
             raise exceptions.NotFound('User not found.')
 
     @permission_classes([IsAuthenticated])
-    def get(self, request, pk, format=None):
-        user = self.get_object(pk)
+    def get(self, request, format=None):
+        user = self.get_object(request.user.id)
         user_serializer = UserSerializer(user)
         return JsonResponse(user_serializer.data)
 
     @permission_classes([IsAuthenticated])
-    def patch(self, request, pk, format=None):
-        user = self.get_object(pk)
+    def patch(self, request, format=None):
+        user = self.get_object(request.user.id)
         user_serializer = UserSerializer(user, data=request.data, partial=True)
         if user_serializer.is_valid():
+            if user_serializer.validated_data['avatar'] is not None:
+                upload_data = cloudinary.uploader.upload(
+                    user_serializer.validated_data['avatar'], folder='djangomongo/users')
+                user_serializer.validated_data['avatar'] = upload_data['secure_url']
             user_serializer.save()
-            return JsonResponse(user_serializer.data)
+            return JsonResponse({'success': True}, status=status.HTTP_200_OK)
         return JsonResponse(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
