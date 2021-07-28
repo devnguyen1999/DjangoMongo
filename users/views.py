@@ -106,6 +106,26 @@ class LogInView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
+class LogOutView(APIView):
+
+    @permission_classes([IsAuthenticated])
+    def post(self, request, format=None):
+        refresh_token = request.COOKIES['refreshtoken']
+        if refresh_token is None:
+            return JsonResponse(
+                {'error_message': 'Authentication credentials were not provided.', },  status=status.HTTP_400_BAD_REQUEST)
+        try:
+            rf_token = RefreshToken.objects.get(token=refresh_token)
+        except RefreshToken.DoesNotExist:
+            return JsonResponse(
+                {'error_message': 'Refresh token not found.', },  status=status.HTTP_404_NOT_FOUND)
+        rf_token.delete()
+        response = JsonResponse({'message': 'Log out successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        response.delete_cookie('refreshtoken')
+        response.delete_cookie('csrftoken')
+        return response
+
+
 class RefreshTokenView(APIView):
 
     def patch(self, request, format=None):

@@ -17,11 +17,12 @@ Including another URLconf
 from django.urls import path, include
 
 urlpatterns = [
-    path('api/admin/', include('admins.urls')),
-    path('api/cart/', include('carts.urls')),
-    path('api/moderator/', include('admins.urls')),
-    path('api/order/', include('orders.urls')),
-    path('api/post/', include('posts.urls')),
-    path('api/product/', include('products.urls')),
-    path('api/user/', include('users.urls')),
+    path('api/admins/', include('admins.urls')),
+    path('api/carts/', include('carts.urls')),
+    path('api/categories/', include('categories.urls')),
+    path('api/moderators/', include('admins.urls')),
+    path('api/orders/', include('orders.urls')),
+    path('api/posts/', include('posts.urls')),
+    path('api/products/', include('products.urls')),
+    path('api/users/', include('users.urls')),
 ]

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Applications
     'admins.apps.AdminsConfig',
     'carts.apps.CartsConfig',
+    'categories.apps.CategoriesConfig',
     'moderators.apps.ModeratorsConfig',
     'orders.apps.OrdersConfig',
     'posts.apps.PostsConfig',
