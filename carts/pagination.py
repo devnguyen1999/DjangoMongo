@@ -1,0 +1,16 @@
+from rest_framework import pagination
+from rest_framework.response import Response
+from collections import OrderedDict
+
+class CustomPagination(pagination.PageNumberPagination):
+    page_size = 2
+    page_query_param = 'p'
+    page_size_query_param = 'ps'
+    max_page_size = 50
+
+    def get_paginated_response(self, data):
+        response = Response(data)
+        response['count'] = self.page.paginator.count
+        response['next'] = self.get_next_link()
+        response['previous'] = self.get_previous_link()
+        return response

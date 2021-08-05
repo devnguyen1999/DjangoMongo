@@ -29,7 +29,7 @@ class LoginView(APIView):
                 token = RefreshToken(user=admin, token=refresh_token)
                 token.save()
                 response = JsonResponse(
-                    {'access_token': access_token, }, status=status.HTTP_200_OK)
+                    {'access_token': access_token, })
                 response.set_cookie(key='refreshtoken',
                                     value=refresh_token, httponly=True)
                 return response
