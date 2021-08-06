@@ -17,8 +17,12 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
 
-
-class CreatePostView(APIView):
+class PostsView(APIView):
+    pagination_class = CustomPagination
+    def get(self, request, format=None):
+        post = Post.objects.all()        
+        post_serializer = PostSerializer(post, many=True)
+        return JsonResponse(post_serializer.data, safe=False)
 
     @permission_classes([IsAuthenticated])
     @method_decorator([admin_only])
@@ -42,7 +46,6 @@ class CreatePostView(APIView):
             post_serializer.save()
             return JsonResponse({'success': True}, status=status.HTTP_201_CREATED, safe=False)
         return JsonResponse(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class PostView(APIView):
 
@@ -101,9 +104,3 @@ class ImageView(APIView):
         else:
             return JsonResponse(image_serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
 
-class PostsView(APIView):
-    pagination_class = CustomPagination
-    def get(self, request, format=None):
-        post = Post.objects.all()        
-        post_serializer = PostSerializer(post, many=True)
-        return JsonResponse(post_serializer.data, safe=False)

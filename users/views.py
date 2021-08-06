@@ -94,8 +94,7 @@ class LogInView(APIView):
                 refresh_token = generate_refresh_token(user)
                 token = RefreshToken(user=user, token=refresh_token)
                 token.save()
-                response = JsonResponse(
-                    {'access_token': access_token, }, status=status.HTTP_200_OK)
+                response = JsonResponse({'access_token': access_token, })
                 response.set_cookie(key='refreshtoken',
                                     value=refresh_token, httponly=True)
                 return response
@@ -267,5 +266,5 @@ class UserProfileView(APIView):
                     user_serializer.validated_data['avatar'], folder='djangomongo/users')
                 user_serializer.validated_data['avatar'] = upload_data['secure_url']
             user_serializer.save()
-            return JsonResponse({'success': True}, status=status.HTTP_200_OK)
+            return JsonResponse({'success': True})
         return JsonResponse(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -13,8 +13,7 @@ class Category(models.Model):
         max_length=3,
         choices=MODULE_CHOICES,
     )
-    parent = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True)
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name

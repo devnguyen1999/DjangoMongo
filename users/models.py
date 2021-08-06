@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
-
 class User(AbstractUser):
     # Delete not use field
     username = None
@@ -37,3 +36,16 @@ class RefreshToken(models.Model):
 
     class Meta:
         db_table = 'Refresh_tokens'
+
+class UserAddress(models.Model):
+    province = models.JSONField()
+    district = models.JSONField()
+    ward = models.JSONField()
+    specific_address = models.CharField(max_length=100)
+    is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.specific_address
+
+    class Meta:
+        db_table = 'User_addresses'

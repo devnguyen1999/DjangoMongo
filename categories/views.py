@@ -18,16 +18,27 @@ from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
 
 
-class CreateCategoryView(APIView):
+class CategoriesView(APIView):
 
+    def get(self, request, format=None):
+        categories = Category.objects.all()        
+        categories_serializer = CategorySerializer(categories, many=True)
+        return JsonResponse(categories_serializer.data, safe=False)
+    
     @permission_classes([IsAuthenticated])
     @method_decorator([admin_only])
     def post(self, request, format=None):
         category_serializer = CategorySerializer(data=request.data)
         if category_serializer.is_valid():
+            try:
+                parent = Category.objects.get(pk=category_serializer.validated_data['parent'])
+            except Category.DoesNotExist:
+                raise exceptions.NotFound('Category not found.')
+            category_serializer.validated_data['parent'] = parent
             category_serializer.save()
-            return JsonResponse({'success': True}, status=status.HTTP_201_CREATED, safe=False)
+            return JsonResponse(category_serializer.validated_data, status=status.HTTP_201_CREATED, safe=False)
         return JsonResponse(category_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class CategoryView(APIView):
@@ -59,10 +70,3 @@ class CategoryView(APIView):
         category = self.get_object(pk)
         category.delete()
         return JsonResponse({'message': 'Category was deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
-
-class CategoriesView(APIView):
-
-    def get(self, request, format=None):
-        categories = Category.objects.all()        
-        categories_serializer = CategorySerializer(categories, many=True)
-        return JsonResponse(categories_serializer.data, safe=False)
