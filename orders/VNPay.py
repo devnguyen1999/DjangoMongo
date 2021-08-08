@@ -38,7 +38,7 @@ def payment_by_VNPay(data):
     # vnp.requestData['vnp_IpAddr'] = ipaddr
     vnp.requestData['vnp_ReturnUrl'] = settings.VNPAY_RETURN_URL
     vnpay_payment_url = vnp.get_payment_url(settings.VNPAY_PAYMENT_URL, settings.VNPAY_HASH_SECRET_KEY)
-    print(vnpay_payment_url)
+    # print(vnpay_payment_url)
     return vnpay_payment_url
 
 
@@ -60,8 +60,8 @@ class vnpay:
                 queryString = key + '=' + urlquote(str(val))
                 hasData = str(key) + '=' + str(val)
 
-        hashValue = self.__md5(secret_key + hasData)
-        return vnpay_payment_url + "?" + queryString + '&vnp_SecureHashType=MD5&vnp_SecureHash=' + hashValue
+        hashValue = self.__sha256(secret_key + hasData)
+        return vnpay_payment_url + "?" + queryString + '&vnp_SecureHashType=SHA256&vnp_SecureHash=' + hashValue
 
     def validate_response(self, secret_key):
         vnp_SecureHash = self.responseData['vnp_SecureHash']
@@ -83,13 +83,13 @@ class vnpay:
                 else:
                     seq = 1
                     hasData = str(key) + '=' + str(val)
-        hashValue = self.__md5(secret_key + hasData)
+        hashValue = self.__sha256(secret_key + hasData)
 
-        print(
-            'Validate debug, HashData:' + secret_key + hasData + "\n HashValue:" + hashValue + "\nInputHash:" + vnp_SecureHash)
+        # print(
+        #     'Validate debug, HashData:' + secret_key + hasData + "\n HashValue:" + hashValue + "\nInputHash:" + vnp_SecureHash)
 
         return vnp_SecureHash == hashValue
 
-    def __md5(self, input):
+    def __sha256(self, input):
         byteInput = input.encode('utf-8')
-        return hashlib.md5(byteInput).hexdigest()
+        return hashlib.sha256(byteInput).hexdigest()

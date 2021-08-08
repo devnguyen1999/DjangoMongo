@@ -10,7 +10,6 @@ class CartSerializer(serializers.ModelSerializer):
         exclude = ['created_at', 'created_by']
     
 class AddToCartSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = ProductInCart
         fields = ['product', 'number']

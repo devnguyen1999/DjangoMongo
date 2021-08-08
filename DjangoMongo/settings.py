@@ -180,7 +180,7 @@ cloudinary.config(
 
 
 # VNPAY CONFIG
-VNPAY_RETURN_URL = 'http://localhost:8000/payment_return'  # get from config
+VNPAY_RETURN_URL = 'http://localhost:8000/api/order/vnpay_payment_return'  # get from config
 VNPAY_PAYMENT_URL = 'http://sandbox.vnpayment.vn/paymentv2/vpcpay.html'  # get from config
 VNPAY_API_URL = 'http://sandbox.vnpayment.vn/merchant_webapi/merchant.html'
 VNPAY_TMN_CODE = 'Z4BDIUMY'  # Website ID in VNPAY System, get from config
@@ -191,3 +191,4 @@ MOMO_PARTNER_CODE = 'MOMOXLEE20210804'
 MOMO_ACCESS_KEY = 'LDmV1PTytjUPAwk7'
 MOMO_SECRET_KEY = 'sG8hjVZLp7EmyWeObRCiRZziY1b7KBPV'
 MOMO_API_ENDPOINT = 'https://test-payment.momo.vn/gw_payment/transactionProcessor'
+MOMO_RETURN_URL = 'http://localhost:8000/api/order/momo_payment_return'

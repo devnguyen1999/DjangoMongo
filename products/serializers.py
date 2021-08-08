@@ -1,11 +1,11 @@
-from posts.models import Post
+from products.models import Product
 from rest_framework import serializers
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required=True)
+    images = serializers.ImageField(required=True)
     class Meta:
-        model = Post
+        model = Product
         exclude = ['created_at', 'created_by']
     
 

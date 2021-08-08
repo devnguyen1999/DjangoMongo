@@ -35,11 +35,6 @@ class PostsView(APIView):
             except User.DoesNotExist:
                 raise exceptions.NotFound('Admin not found.')
             post_serializer.validated_data['created_by'] = user
-            try:
-                category = Category.objects.get(pk=post_serializer.validated_data['category'])
-            except Category.DoesNotExist:
-                raise exceptions.NotFound('Category not found.')
-            post_serializer.validated_data['category'] = category
             upload_data = cloudinary.uploader.upload(
                 post_serializer.validated_data['image'], folder='djangomongo/posts')
             post_serializer.validated_data['image'] = upload_data['secure_url']

@@ -8,7 +8,7 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     fake_price = models.PositiveIntegerField()
     price = models.PositiveIntegerField()
-    image = models.JSONField()
+    images = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
@@ -21,7 +21,7 @@ class Product(models.Model):
 
 class ProductComment(models.Model):
     comment = models.TextField()
-    image = models.JSONField()
+    images = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 

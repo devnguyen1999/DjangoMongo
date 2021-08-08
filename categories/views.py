@@ -30,13 +30,8 @@ class CategoriesView(APIView):
     def post(self, request, format=None):
         category_serializer = CategorySerializer(data=request.data)
         if category_serializer.is_valid():
-            try:
-                parent = Category.objects.get(pk=category_serializer.validated_data['parent'])
-            except Category.DoesNotExist:
-                raise exceptions.NotFound('Category not found.')
-            category_serializer.validated_data['parent'] = parent
             category_serializer.save()
-            return JsonResponse(category_serializer.validated_data, status=status.HTTP_201_CREATED, safe=False)
+            return JsonResponse({'success': True}, status=status.HTTP_201_CREATED)
         return JsonResponse(category_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

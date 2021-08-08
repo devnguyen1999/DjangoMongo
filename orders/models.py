@@ -1,5 +1,5 @@
 from products.models import Product
-from users.models import User
+from users.models import User, UserAddress
 from djongo import models
 
 # Create your models here.
@@ -15,8 +15,8 @@ class Order(models.Model):
     shipping_fee = models.PositiveIntegerField()
     total_price = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    # delivery_address = models.ForeignKey(UserAddress, on_delete=models.CASCADE, null=True, blank=True)
     payment_method = models.CharField(
         max_length=3,
         choices=PAYMENT_METHODS_CHOICES,
@@ -31,14 +31,14 @@ class Order(models.Model):
 
 
 class ProductInOrder(models.Model):
-    product = models.ManyToManyField(Product)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100)
     price = models.PositiveIntegerField()
     image = models.URLField(max_length=200)
     number = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name

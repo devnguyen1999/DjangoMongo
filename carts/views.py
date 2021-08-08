@@ -1,22 +1,14 @@
 from products.models import Product
 from carts.serializers import AddToCartSerializer, CartSerializer
 from carts.models import ProductInCart
-from posts.pagination import CustomPagination
-from categories.models import Category
+from carts.pagination import CustomPagination
 from admins.decorators import admin_only
 from rest_framework.decorators import parser_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from posts.serializers import DeleteImageSerializer, UploadImageSerializer, PostSerializer
 from django.http.response import JsonResponse
 from rest_framework import exceptions, status
-from posts.models import Post
 from users.models import User
 from rest_framework.views import APIView
-from django.utils.decorators import method_decorator
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-import cloudinary.uploader
-from django.core.serializers import serialize 
-from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
 
@@ -39,14 +31,11 @@ class CartView(APIView):
             except User.DoesNotExist:
                 raise exceptions.NotFound('User not found.')
             product_serializer.validated_data['created_by'] = user
-            try:
-                product = Product.objects.get(pk=product_serializer.validated_data['product'])
-            except Product.DoesNotExist:
-                raise exceptions.NotFound('Product not found.')
-            product_serializer.validated_data['product'] = product
+            product = product_serializer.validated_data['product']
             product_serializer.validated_data['name'] = product.name
             product_serializer.validated_data['price'] = product.price
-            product_serializer.validated_data['image'] = product.image[0]
+            product_serializer.validated_data['image'] = product.images[0]
+            product_serializer.save()
             return JsonResponse({'success': True}, status=status.HTTP_201_CREATED)
         return JsonResponse(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

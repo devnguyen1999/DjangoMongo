@@ -6,7 +6,7 @@ class PostSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=True)
     class Meta:
         model = Post
-        fields = ['title', 'short_content', 'content', 'image' ]
+        exclude = ['created_at', 'created_by']
 
 
 
